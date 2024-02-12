@@ -17,16 +17,6 @@ const resolvers: Resolvers<{}> = {
     hasPreviousPage: (parent) => parent.hasNextPage,
   },
 
-  TeamsConnectionEdge: {
-    cursor: (parent) => parent.cursor,
-    node: (parent) => parent.node,
-  },
-
-  TeamsConnection: {
-    pageInfo: (parent) => parent.pageInfo,
-    edges: (parent) => parent.edges,
-  },
-
   UsersConnectionEdge: {
     cursor: (parent) => parent.cursor,
     node: (parent) => parent.node,
@@ -71,18 +61,6 @@ const resolvers: Resolvers<{}> = {
       }
 
       return team;
-    },
-
-    teams: async (_root, args) => {
-      const { findManyArgs, toConnection } = parsePaginationArgs(args, {
-        connectionName: "teams",
-      });
-
-      const teams = await prisma.team.findMany({
-        ...findManyArgs,
-      });
-
-      return toConnection(teams);
     },
   },
 };

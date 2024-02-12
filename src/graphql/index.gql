@@ -1,23 +1,8 @@
-query GetTeams($first: Int!, $after: String) {
-  teams(first: $first, after: $after) {
+query GetTeam($id: String!) {
+  team(id: $id) {
     __typename
-
-    pageInfo {
-      __typename
-      endCursor
-      hasNextPage
-    }
-
-    edges {
-      __typename
-      cursor
-
-      node {
-        __typename
-        id
-        name
-      }
-    }
+    id
+    name
   }
 }
 
