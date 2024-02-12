@@ -1,0 +1,36 @@
+query GetTeam($teamId: String!) {
+  team(id: $teamId) {
+    __typename
+    id
+    name
+  }
+}
+
+query GetUsers($teamId: String!, $first: Int!, $after: String) {
+  team(id: $teamId) {
+    __typename
+    id
+    name
+
+    users(first: $first, after: $after) {
+      __typename
+
+      pageInfo {
+        __typename
+        endCursor
+        hasNextPage
+      }
+
+      edges {
+        __typename
+        cursor
+
+        node {
+          __typename
+          id
+          name
+        }
+      }
+    }
+  }
+}

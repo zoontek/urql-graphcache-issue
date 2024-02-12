@@ -1,0 +1,4 @@
+projects:
+  base:
+    schema: "src/graphql/schema.gql"
+    documents: "src/graphql/index.gql"

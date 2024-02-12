@@ -1,0 +1,50 @@
+{
+  "name": "urql-pagination-issue",
+  "private": true,
+  "version": "1.0.0",
+  "scripts": {
+    "build": "yarn codegen && next build",
+    "codegen": "graphql-codegen",
+    "dev": "yarn codegen && next dev",
+    "format": "prettier '**/*' -u -w",
+    "start": "next start",
+    "typecheck": "tsc --noEmit"
+  },
+  "prettier": {
+    "trailingComma": "all",
+    "plugins": [
+      "prettier-plugin-organize-imports"
+    ]
+  },
+  "dependencies": {
+    "@0no-co/graphql.web": "1.0.4",
+    "@graphql-tools/schema": "10.0.2",
+    "@urql/core": "4.2.2",
+    "@urql/devtools": "2.0.3",
+    "@urql/exchange-graphcache": "6.4.0",
+    "graphql-tag": "2.12.6",
+    "graphql-yoga": "5.1.1",
+    "next": "14.0.4",
+    "react": "18.2.0",
+    "react-dom": "18.2.0",
+    "urql": "4.0.6"
+  },
+  "devDependencies": {
+    "@graphql-codegen/cli": "5.0.0",
+    "@graphql-codegen/introspection": "4.0.0",
+    "@graphql-codegen/plugin-helpers": "5.0.1",
+    "@graphql-codegen/typed-document-node": "5.0.1",
+    "@graphql-codegen/typescript": "4.0.1",
+    "@graphql-codegen/typescript-operations": "4.0.1",
+    "@graphql-codegen/typescript-resolvers": "4.0.1",
+    "@graphql-codegen/typescript-urql-graphcache": "3.1.0",
+    "@types/node": "20.11.2",
+    "@types/react": "18.2.48",
+    "@urql/introspection": "1.0.2",
+    "graphql": "16.8.1",
+    "prettier": "3.2.2",
+    "prettier-plugin-organize-imports": "3.2.4",
+    "tsx": "4.7.0",
+    "typescript": "5.3.3"
+  }
+}
