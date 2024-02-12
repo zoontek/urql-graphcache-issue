@@ -1,10 +1,12 @@
 import { devtoolsExchange } from "@urql/devtools";
 import { cacheExchange } from "@urql/exchange-graphcache";
 import { relayPagination } from "@urql/exchange-graphcache/extras";
+import Link from "next/link";
+import { useRouter } from "next/router";
 import { useState } from "react";
 import { Provider, createClient, fetchExchange, useQuery } from "urql";
 import {
-  GetTeamDocument,
+  GetTeamsDocument,
   GetUsersDocument,
   GraphCacheConfig,
 } from "../graphql";
@@ -13,13 +15,16 @@ import schema from "../graphql/introspection.json";
 export const client = createClient({
   url: "/api",
   fetchOptions: { next: { revalidate: 0 } },
-  requestPolicy: "cache-first",
+  requestPolicy: "cache-and-network",
   exchanges: [
     devtoolsExchange,
     cacheExchange<GraphCacheConfig>({
       schema,
 
       resolvers: {
+        Query: {
+          teams: relayPagination({ mergeMode: "inwards" }),
+        },
         Team: {
           users: relayPagination({ mergeMode: "inwards" }),
         },
@@ -29,13 +34,13 @@ export const client = createClient({
   ],
 });
 
-const Users = () => {
+const Users = ({ teamId }: { teamId: string }) => {
+  const router = useRouter();
+  const [after, setAfter] = useState<string | null>();
+
   const [{ fetching, data, error, stale }] = useQuery({
     query: GetUsersDocument,
-    variables: {
-      teamId: "urql",
-      first: 10,
-    },
+    variables: { teamId, first: 5, after },
   });
 
   console.log(
@@ -44,36 +49,17 @@ const Users = () => {
     "\n" + "stale",
     stale,
     "\n" + "users",
-    data?.team.users,
+    data?.team.users?.edges,
   );
 
-  if (fetching) {
-    return <span>Loading…</span>;
-  }
-  if (error) {
-    return <span>Error: {error.message}</span>;
+  if (fetching && data == null && error == null) {
+    return <span>Initial fetching…</span>;
   }
 
-  return (
-    <code>
-      <pre>{JSON.stringify(data?.team, null, 2)}</pre>
-    </code>
-  );
-};
+  const users = data?.team.users;
 
-const App = () => {
-  const [{ fetching, data, error }] = useQuery({
-    query: GetTeamDocument,
-    variables: { teamId: "urql" },
-  });
-
-  const [usersVisible, setUsersVisible] = useState(false);
-
-  if (fetching) {
-    return <span>Loading…</span>;
-  }
-  if (error) {
-    return <span>Error: {error.message}</span>;
+  if (users == null || error != null) {
+    return <span>Error</span>;
   }
 
   return (
@@ -84,17 +70,89 @@ const App = () => {
         flexDirection: "column",
       }}
     >
-      <code>
-        <pre>{JSON.stringify(data?.team, null, 2)}</pre>
-      </code>
+      <button
+        onClick={() => {
+          router.back();
+        }}
+      >
+        ⬅️ Go back to Teams
+      </button>
 
-      {usersVisible ? (
-        <Users />
-      ) : (
-        <button onClick={() => setUsersVisible(true)}>Fetch team users</button>
-      )}
+      <h1>Users</h1>
+
+      {users.edges.map(({ node }) => (
+        <div key={node.id}>
+          <span>{node.name}</span>
+
+          <code>
+            <pre>{JSON.stringify(node, null, 2)}</pre>
+          </code>
+        </div>
+      ))}
+
+      <button
+        disabled={!users.pageInfo.hasNextPage}
+        onClick={() => {
+          setAfter(users.pageInfo.endCursor);
+        }}
+      >
+        Fetch next teams
+      </button>
     </div>
   );
+};
+
+const Teams = () => {
+  const [after, setAfter] = useState<string | null>();
+
+  const [{ fetching, data, error }] = useQuery({
+    query: GetTeamsDocument,
+    variables: { first: 5, after },
+  });
+
+  if (fetching && data == null && error == null) {
+    return <span>Initial fetching…</span>;
+  }
+  if (data == null || error != null) {
+    return <span>Error</span>;
+  }
+
+  return (
+    <div
+      style={{
+        alignItems: "flex-start",
+        display: "flex",
+        flexDirection: "column",
+      }}
+    >
+      <h1>Teams</h1>
+
+      {data.teams.edges.map(({ node }) => (
+        <div key={node.id}>
+          <Link href={`/?team=${node.id}`}>{node.name}</Link>
+
+          <code>
+            <pre>{JSON.stringify(node, null, 2)}</pre>
+          </code>
+        </div>
+      ))}
+
+      <button
+        disabled={!data.teams.pageInfo.hasNextPage}
+        onClick={() => {
+          setAfter(data.teams.pageInfo.endCursor);
+        }}
+      >
+        Fetch next teams
+      </button>
+    </div>
+  );
+};
+
+const App = () => {
+  const { query } = useRouter();
+  const team = Array.isArray(query.team) ? query.team[0] : query.team;
+  return team ? <Users teamId={team} /> : <Teams />;
 };
 
 export default () => (

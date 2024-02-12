@@ -38,13 +38,20 @@ const config: CodegenConfig = {
       config: {
         avoidOptionals: true,
         enumsAsTypes: true,
+        mapperTypeSuffix: "Model",
+        mappers: {
+          Team: "@prisma/client#Team",
+          User: "@prisma/client#User",
+        },
       },
     },
 
     [file("./src/graphql/introspection.json")]: {
       plugins: ["introspection"],
       config: { descriptions: false },
-      hooks: { afterOneFileWrite: "yarn tsx scripts/cleanIntrospection.ts" },
+      hooks: {
+        afterOneFileWrite: "yarn tsx scripts/cleanIntrospection.ts",
+      },
     },
   },
 };

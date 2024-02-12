@@ -26,6 +26,17 @@ type Team {
   users(first: Int!, after: String): UsersConnection
 }
 
+type TeamsConnectionEdge {
+  cursor: String!
+  node: Team!
+}
+
+type TeamsConnection {
+  edges: [TeamsConnectionEdge!]!
+  pageInfo: PageInfo!
+}
+
 type Query {
   team(id: String!): Team!
+  teams(first: Int!, after: String): TeamsConnection!
 }
