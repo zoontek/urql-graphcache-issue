@@ -2,8 +2,8 @@ import {
   getIntrospectedSchema,
   minifyIntrospectionQuery,
 } from "@urql/introspection";
-import fs from "fs";
-import path from "path";
+import fs from "node:fs";
+import path from "node:path";
 
 const filepath = path.resolve(process.argv[2] ?? "");
 const file = fs.readFileSync(filepath, "utf-8");

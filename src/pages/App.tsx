@@ -29,23 +29,23 @@ export const client = createClient({
   ],
 });
 
-// console.log(
-//   "fetching",
-//   fetching,
-//   "\n" + "stale",
-//   stale,
-//   "\n" + "users",
-//   data?.team.users,
-// );
-
 const Users = () => {
-  const [{ fetching, data, error }] = useQuery({
+  const [{ fetching, data, error, stale }] = useQuery({
     query: GetUsersDocument,
     variables: {
       teamId: "urql",
       first: 10,
     },
   });
+
+  console.log(
+    "fetching",
+    fetching,
+    "\n" + "stale",
+    stale,
+    "\n" + "users",
+    data?.team.users,
+  );
 
   if (fetching) {
     return <span>Loading…</span>;
